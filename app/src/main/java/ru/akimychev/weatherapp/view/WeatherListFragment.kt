@@ -9,15 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
+import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.viewmodel.AppState
 import ru.akimychev.weatherapp.viewmodel.WeatherListViewModel
 
 class WeatherListFragment : Fragment() {
+    //Возвращает фрагмент
     companion object {
         fun newInstance() = WeatherListFragment()
     }
 
+    //Инициировали ViewBinding и раздули во фрагменте
     private var _binding: FragmentWeatherListBinding? = null
     private val binding get() = _binding!!
     lateinit var viewModel: WeatherListViewModel
@@ -32,19 +36,23 @@ class WeatherListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(WeatherListViewModel::class.java)
-        viewModel.getLiveData().observe(viewLifecycleOwner, object : Observer<AppState> {
-            override fun onChanged(t: AppState) {
-                renderData(t)
-            }
-        })
+        viewModel = ViewModelProvider(this).get(WeatherListViewModel::class.java)//Заварили чан с VM
+        viewModel.getLiveData().observe(
+            viewLifecycleOwner,
+            object : Observer<AppState> { //Подписали VM на обновления View (Связка LD/LO)
+                override fun onChanged(t: AppState) {
+                    renderData(t)
+                }
+            })
         viewModel.sendRequest()
     }
 
+    //Способы отображения "Статусов"
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
                 val weatherData = appState.weatherData
+                setData(weatherData)
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(binding.mainView, "Success", Snackbar.LENGTH_LONG).show()
             }
@@ -53,6 +61,7 @@ class WeatherListFragment : Fragment() {
             }
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
+                Toast.makeText(context, "Что-то пошло не так", Toast.LENGTH_SHORT).show()
                 Snackbar
                     .make(binding.mainView, "Error", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Reload") {
@@ -61,6 +70,18 @@ class WeatherListFragment : Fragment() {
                     .show()
             }
         }
+    }
+
+    //Обработка данных
+    private fun setData(weatherData: Weather) {
+        binding.cityName.text = weatherData.city.name
+        binding.cityCoordinates.text = String.format(
+            getString(R.string.city_coordinates),
+            weatherData.city.lat.toString(),
+            weatherData.city.lon.toString()
+        )
+        binding.temperatureValue.text = weatherData.temperature.toString()
+        binding.feelsLikeValue.text = weatherData.feelsLike.toString()
     }
 
     override fun onDestroyView() {
