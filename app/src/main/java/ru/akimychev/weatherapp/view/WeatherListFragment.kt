@@ -9,9 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
-import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.viewmodel.AppState
 import ru.akimychev.weatherapp.viewmodel.WeatherListViewModel
 
@@ -20,6 +18,8 @@ class WeatherListFragment : Fragment() {
     companion object {
         fun newInstance() = WeatherListFragment()
     }
+
+    var isMixed = true
 
     //Инициировали ViewBinding и раздули во фрагменте
     private var _binding: FragmentWeatherListBinding? = null
@@ -44,36 +44,52 @@ class WeatherListFragment : Fragment() {
                     renderData(t)
                 }
             })
-        viewModel.sendRequest()
+
+        binding.weatherListFragmentFAB.setOnClickListener {
+            whichListToChoose()
+        }
     }
 
     //Способы отображения "Статусов"
     private fun renderData(appState: AppState) {
         when (appState) {
-            is AppState.Success -> {
+            is AppState.SuccessSingle -> {
                 val weatherData = appState.weatherData
-                setData(weatherData)
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainView, "Success", Snackbar.LENGTH_LONG).show()
+                //setData(weatherData)
+                //binding.weatherListFragmentLoadingLayout.visibility = View.GONE
+                //  Snackbar.make(binding.root, "Success", Snackbar.LENGTH_LONG).show()
             }
             is AppState.Loading -> {
-                binding.loadingLayout.visibility = View.VISIBLE
+                binding.weatherListFragmentLoadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
+                binding.weatherListFragmentLoadingLayout.visibility = View.GONE
                 Toast.makeText(context, "Что-то пошло не так", Toast.LENGTH_SHORT).show()
-                Snackbar
-                    .make(binding.mainView, "Error", Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(binding.root, "Error", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Reload") {
-                        viewModel.sendRequest()
+                        whichListToChoose()
                     }
                     .show()
+            }
+            is AppState.SuccessList -> {
+                binding.weatherListFragmentLoadingLayout.visibility = View.GONE
+                binding.weatherListFragmentRecyclerView.adapter =
+                    WeatherListAdapter(appState.weatherListData)
             }
         }
     }
 
+    private fun whichListToChoose() {
+        isMixed = !isMixed
+        if (isMixed) {
+            viewModel.getWeatherListForWorld()
+        } else {
+            viewModel.getWeatherListForRussia()
+        }
+    }
+
     //Обработка данных
-    private fun setData(weatherData: Weather) {
+    /*private fun setData(weatherData: Weather) {
         binding.cityName.text = weatherData.city.name
         binding.cityCoordinates.text = String.format(
             getString(R.string.city_coordinates),
@@ -87,5 +103,5 @@ class WeatherListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
+    }*/
 }
