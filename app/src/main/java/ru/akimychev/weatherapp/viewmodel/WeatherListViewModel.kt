@@ -3,6 +3,7 @@ package ru.akimychev.weatherapp.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.akimychev.weatherapp.model.*
+import java.lang.Thread.sleep
 import kotlin.random.Random
 
 class WeatherListViewModel(
@@ -36,13 +37,14 @@ class WeatherListViewModel(
     //Идет запрос
     private fun sendRequest(location: Location) {
         liveData.value = AppState.Loading
-        val rand = Random(System.nanoTime())
-        if ((0..3).random(rand) == 1) {
-            liveData.value = AppState.Error(IllegalStateException("Что-то пошло не так"))
-        } else {
-            liveData.value =
-                AppState.SuccessList(repositoryList.getListWeather(location))
-        }
+        Thread{
+            sleep(1000L)
+            val rand = Random(System.nanoTime())
+            if ((0..5).random(rand) == 1) {
+                liveData.postValue(AppState.Error(IllegalStateException("Что-то пошло не так")))
+            } else {
+                liveData.postValue(AppState.SuccessList(repositoryList.getListWeather(location)))
+            }}.start()
     }
 
     private fun isConnection(): Boolean {
