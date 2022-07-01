@@ -1,5 +1,6 @@
 package ru.akimychev.weatherapp.view
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,7 @@ class WeatherListAdapter(private val dataList: List<Weather>) :
         fun bind(weather: Weather) {
             val binding = FragmentWeatherListRecyclerItemBinding.bind(itemView)
             binding.cityName.text = weather.city.name
-            binding.temperatureValue.text = weather.temperature.toString()
+            binding.temperatureValue.text = weather.temperature.toString() + "°C"
         }
 
     }
