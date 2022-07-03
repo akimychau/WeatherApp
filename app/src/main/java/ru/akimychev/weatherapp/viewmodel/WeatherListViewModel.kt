@@ -2,7 +2,11 @@ package ru.akimychev.weatherapp.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.akimychev.weatherapp.model.*
+import ru.akimychev.weatherapp.model.RepositoryListCitiesWeather
+import ru.akimychev.weatherapp.model.RepositoryLocalImpl
+import ru.akimychev.weatherapp.model.RepositoryRemoteImpl
+import ru.akimychev.weatherapp.model.RepositorySingleCityWeather
+import ru.akimychev.weatherapp.utils.Location
 import java.lang.Thread.sleep
 import kotlin.random.Random
 
@@ -10,8 +14,8 @@ class WeatherListViewModel(
     private val liveData: MutableLiveData<AppState> = MutableLiveData(),
 ) :
     ViewModel() {
-    lateinit var repositorySingle: RepositorySingle
-    lateinit var repositoryList: RepositoryList
+    lateinit var repositorySingle: RepositorySingleCityWeather
+    lateinit var repositoryList: RepositoryListCitiesWeather
     fun getLiveData(): MutableLiveData<AppState> {
         choiceRepository()
         return liveData
@@ -27,24 +31,26 @@ class WeatherListViewModel(
         repositoryList = RepositoryLocalImpl()
     }
 
-    fun getWeatherListForRussia(){
+    fun getWeatherListForRussia() {
         sendRequest(Location.Russia)
     }
-    fun getWeatherListForWorld(){
+
+    fun getWeatherListForWorld() {
         sendRequest(Location.World)
     }
 
     //Идет запрос
     private fun sendRequest(location: Location) {
         liveData.value = AppState.Loading
-        Thread{
+        Thread {
             sleep(1000L)
             val rand = Random(System.nanoTime())
             if ((0..5).random(rand) == 1) {
                 liveData.postValue(AppState.Error(IllegalStateException("Что-то пошло не так")))
             } else {
                 liveData.postValue(AppState.SuccessList(repositoryList.getListWeather(location)))
-            }}.start()
+            }
+        }.start()
     }
 
     private fun isConnection(): Boolean {

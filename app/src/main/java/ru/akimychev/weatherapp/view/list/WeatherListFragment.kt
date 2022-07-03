@@ -1,4 +1,4 @@
-package ru.akimychev.weatherapp.view
+package ru.akimychev.weatherapp.view.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,11 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
+import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.view.details.DetailsFragment
+import ru.akimychev.weatherapp.view.details.OnItemClick
 import ru.akimychev.weatherapp.viewmodel.AppState
 import ru.akimychev.weatherapp.viewmodel.WeatherListViewModel
 
-class WeatherListFragment : Fragment() {
+class WeatherListFragment : Fragment(), OnItemClick {
     //Возвращает фрагмент
     companion object {
         fun newInstance() = WeatherListFragment()
@@ -25,6 +29,7 @@ class WeatherListFragment : Fragment() {
     private var _binding: FragmentWeatherListBinding? = null
     private val binding get() = _binding!!
     lateinit var viewModel: WeatherListViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,6 +53,7 @@ class WeatherListFragment : Fragment() {
         binding.weatherListFragmentFAB.setOnClickListener {
             whichListToChoose()
         }
+        viewModel.getWeatherListForWorld()
     }
 
     //Способы отображения "Статусов"
@@ -74,7 +80,7 @@ class WeatherListFragment : Fragment() {
             is AppState.SuccessList -> {
                 binding.weatherListFragmentLoadingLayout.visibility = View.GONE
                 binding.weatherListFragmentRecyclerView.adapter =
-                    WeatherListAdapter(appState.weatherListData)
+                    WeatherListAdapter(appState.weatherListData, this)
             }
         }
     }
@@ -88,20 +94,9 @@ class WeatherListFragment : Fragment() {
         }
     }
 
-    //Обработка данных
-    /*private fun setData(weatherData: Weather) {
-        binding.cityName.text = weatherData.city.name
-        binding.cityCoordinates.text = String.format(
-            getString(R.string.city_coordinates),
-            weatherData.city.lat.toString(),
-            weatherData.city.lon.toString()
-        )
-        binding.temperatureValue.text = weatherData.temperature.toString()
-        binding.feelsLikeValue.text = weatherData.feelsLike.toString()
+    override fun onItemClick(weather: Weather) {
+        requireActivity().supportFragmentManager.beginTransaction().hide(this)
+            .add(R.id.container, DetailsFragment.newInstance(weather)).addToBackStack("")
+            .commit()
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }*/
 }

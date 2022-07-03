@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.ActivityMainBinding
+import ru.akimychev.weatherapp.view.list.WeatherListFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

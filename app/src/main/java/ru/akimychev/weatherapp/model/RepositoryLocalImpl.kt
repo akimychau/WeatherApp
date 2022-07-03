@@ -3,8 +3,9 @@ package ru.akimychev.weatherapp.model
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.domain.getRussianCities
 import ru.akimychev.weatherapp.domain.getWorldCities
+import ru.akimychev.weatherapp.utils.Location
 
-class RepositoryLocalImpl : RepositorySingle, RepositoryList {
+class RepositoryLocalImpl : RepositorySingleCityWeather, RepositoryListCitiesWeather {
 
     override fun getWeather(lat: Double, lon: Double): Weather {
         return Weather()

@@ -1,14 +1,14 @@
-package ru.akimychev.weatherapp.view
+package ru.akimychev.weatherapp.view.list
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListRecyclerItemBinding
 import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.view.details.OnItemClick
 
-class WeatherListAdapter(private val dataList: List<Weather>) :
+class WeatherListAdapter(private val dataList: List<Weather>, private val callback: OnItemClick) :
     RecyclerView.Adapter<WeatherListAdapter.WeatherViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
         val binding =
@@ -24,12 +24,14 @@ class WeatherListAdapter(private val dataList: List<Weather>) :
         return dataList.size
     }
 
-    class WeatherViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class WeatherViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(weather: Weather) {
             val binding = FragmentWeatherListRecyclerItemBinding.bind(itemView)
             binding.cityName.text = weather.city.name
             binding.temperatureValue.text = weather.temperature.toString() + "°C"
+            binding.root.setOnClickListener {
+                callback.onItemClick(weather)
+            }
         }
-
     }
 }

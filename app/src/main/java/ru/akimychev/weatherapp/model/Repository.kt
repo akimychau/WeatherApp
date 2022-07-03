@@ -1,16 +1,12 @@
 package ru.akimychev.weatherapp.model
 
 import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.utils.Location
 
-fun interface RepositorySingle {
+fun interface RepositorySingleCityWeather {
     fun getWeather(lat: Double, lon: Double): Weather
 }
 
-fun interface RepositoryList {
+fun interface RepositoryListCitiesWeather {
     fun getListWeather(location: Location): List<Weather>
-}
-
-sealed class Location {
-    object Russia : Location()
-    object World : Location()
 }
