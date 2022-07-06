@@ -4,4 +4,6 @@
     <string name="feels_like_label">Ощущается как</string>
     <string name="city_coordinates">lt/ln: %s, %s"</string>
     <string name="todo">TODO</string>
+    <string name="error">Ошибка</string>
+    <string name="reload">Попробовать снова</string>
 </resources>

@@ -19,34 +19,29 @@ class DetailsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
-        if (weather != null) {
-            renderData(weather)
-        }
+        arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
+            .also { weather -> weather?.let { renderData(it) } }
     }
 
     //Способы отображения "Статусов"
     private fun renderData(weather: Weather) {
-        setData(weather)
-    }
-
-    //Обработка данных
-    private fun setData(weather: Weather) {
-        binding.cityName.text = weather.city.name
-        binding.cityCoordinates.text = String.format(
-            getString(R.string.city_coordinates),
-            weather.city.lat.toString(),
-            weather.city.lon.toString()
-        )
-        binding.temperatureValue.text = weather.temperature.toString()
-        binding.feelsLikeValue.text = weather.feelsLike.toString()
+        with(binding) {
+            cityName.text = weather.city.name
+            cityCoordinates.text = String.format(
+                getString(R.string.city_coordinates),
+                weather.city.lat.toString(),
+                weather.city.lon.toString()
+            )
+            temperatureValue.text = weather.temperature.toString()
+            feelsLikeValue.text = weather.feelsLike.toString()
+        }
     }
 
     override fun onDestroyView() {
@@ -58,10 +53,10 @@ class DetailsFragment : Fragment() {
     companion object {
         const val BUNDLE_EXTRA_WEATHER = "BUNDLE_EXTRA_WEATHER"
         fun newInstance(weather: Weather): DetailsFragment {
-            val bundle = Bundle()
-            bundle.putParcelable(BUNDLE_EXTRA_WEATHER, weather)
             val fragment = DetailsFragment()
-            fragment.arguments = bundle
+            fragment.arguments = Bundle().apply {
+                putParcelable(BUNDLE_EXTRA_WEATHER, weather)
+            }
             return fragment
         }
     }

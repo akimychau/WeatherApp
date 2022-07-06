@@ -7,9 +7,7 @@ import ru.akimychev.weatherapp.utils.Location
 
 class RepositoryLocalImpl : RepositorySingleCityWeather, RepositoryListCitiesWeather {
 
-    override fun getWeather(lat: Double, lon: Double): Weather {
-        return Weather()
-    }
+    override fun getWeather(lat: Double, lon: Double) = Weather()
 
     override fun getListWeather(location: Location): List<Weather> {
         return when (location) {
