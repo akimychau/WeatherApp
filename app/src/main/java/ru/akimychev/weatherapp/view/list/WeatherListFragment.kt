@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_weather_list.*
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
 import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.utils.showSnackBar
 import ru.akimychev.weatherapp.view.details.DetailsFragment
 import ru.akimychev.weatherapp.view.details.OnItemClick
 import ru.akimychev.weatherapp.viewmodel.AppState
@@ -52,7 +52,7 @@ class WeatherListFragment : Fragment(), OnItemClick {
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.SuccessSingle -> {
-                val weatherData = appState.weatherData
+                //val weatherData = appState.weatherData
                 //setData(weatherData)
                 //binding.weatherListFragmentLoadingLayout.visibility = View.GONE
                 //  Snackbar.make(binding.root, "Success", Snackbar.LENGTH_LONG).show()
@@ -73,15 +73,6 @@ class WeatherListFragment : Fragment(), OnItemClick {
                     WeatherListAdapter(appState.weatherListData, this)
             }
         }
-    }
-
-    private fun View.showSnackBar(
-        text: String,
-        actionText: String,
-        action: (View) -> Unit,
-        length: Int = Snackbar.LENGTH_INDEFINITE
-    ) {
-        Snackbar.make(this, text, length).setAction(actionText, action).show()
     }
 
     private fun loadingGone() {

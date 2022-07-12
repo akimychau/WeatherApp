@@ -2,16 +2,20 @@ package ru.akimychev.weatherapp.view.details
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.fragment_details.*
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentDetailsBinding
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
 import ru.akimychev.weatherapp.utils.WeatherLoader
+import ru.akimychev.weatherapp.utils.showSnackBar
+import java.net.MalformedURLException
 
 class DetailsFragment : Fragment() {
 
@@ -44,8 +48,17 @@ class DetailsFragment : Fragment() {
                 weatherLocal.city.lat,
                 weatherLocal.city.lon
             ) { weatherDTO ->
-                bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
-
+                try {
+                    bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
+                } catch (m: MalformedURLException) {
+                    Log.d("@@@", "$m")
+                    detailsFragmentRootView.showSnackBar(
+                        getString(R.string.error),
+                        getString(R.string.reload),
+                        {
+                            bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
+                        })
+                }
             }
         }
     }
