@@ -28,7 +28,6 @@ class WeatherListAdapter(private val dataList: List<Weather>, private val callba
         fun bind(weather: Weather) {
             FragmentWeatherListRecyclerItemBinding.bind(itemView).apply {
                 cityName.text = weather.city.name
-                temperatureValue.text = weather.temperature.toString() + "°C"
                 root.setOnClickListener {
                     callback.onItemClick(weather)
                 }
