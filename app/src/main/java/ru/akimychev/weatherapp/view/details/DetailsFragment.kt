@@ -1,5 +1,9 @@
 package ru.akimychev.weatherapp.view.details
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -8,13 +12,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.fragment_details.*
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentDetailsBinding
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
-import ru.akimychev.weatherapp.utils.WeatherLoader
-import ru.akimychev.weatherapp.utils.showSnackBar
+import ru.akimychev.weatherapp.utils.*
 import java.net.MalformedURLException
 
 class DetailsFragment : Fragment() {
@@ -22,6 +26,17 @@ class DetailsFragment : Fragment() {
     //Инициировали ViewBinding и раздули во фрагменте
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
+
+    private val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                intent?.let {
+                    it.getParcelableExtra<WeatherDTO>(BUNDLE_WEATHER_DTO_KEY)?.let { weatherDTO ->
+                        bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
+                }
+            }
+        }
+    }
+    lateinit var weatherLocal: Weather
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,29 +52,15 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
-        weather?.let { weatherLocal ->
-            /*WeatherLoader.requestFirstVariant(
-                weatherLocal.city.lat,
-                weatherLocal.city.lon
-            ) { weatherDTO ->
-                bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
-            }*/
-            WeatherLoader.requestSecondVariant(
-                weatherLocal.city.lat,
-                weatherLocal.city.lon
-            ) { weatherDTO ->
-                try {
-                    bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
-                } catch (m: MalformedURLException) {
-                    Log.d("@@@", "$m")
-                    detailsFragmentRootView.showSnackBar(
-                        getString(R.string.error),
-                        getString(R.string.reload),
-                        {
-                            bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
-                        })
-                }
-            }
+        weather?.let {weatherLocal->
+            this.weatherLocal = weatherLocal
+            LocalBroadcastManager.getInstance(requireContext())
+                .registerReceiver(receiver, IntentFilter(WAVE))
+
+            requireActivity().startService(Intent(requireContext(), DetailsServiceIntent::class.java).apply {
+                putExtra(BUNDLE_CITY_KEY, weatherLocal.city)
+            })
+
         }
     }
 
@@ -67,12 +68,10 @@ class DetailsFragment : Fragment() {
         weatherLocal: Weather,
         weatherDTO: WeatherDTO
     ) {
-        requireActivity().runOnUiThread {
             renderData(weatherLocal.apply {
                 weatherLocal.feelsLike = weatherDTO.fact.feelsLike
                 weatherLocal.temperature = weatherDTO.fact.temp
             })
-        }
     }
 
     //Способы отображения "Статусов"
@@ -92,6 +91,7 @@ class DetailsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
     }
 
     //Возвращает фрагмент
