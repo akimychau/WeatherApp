@@ -28,6 +28,8 @@
         <service android:name=".view.details.DetailsServiceIntent"
             android:exported="true"/>
 
+
+
     </application>
 
 </manifest>
