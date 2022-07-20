@@ -12,7 +12,7 @@ import ru.akimychev.weatherapp.view.list.WeatherListFragment
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private val receiver = MainBroadcastReceiver()
+    private val receiver = ConnectivityBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

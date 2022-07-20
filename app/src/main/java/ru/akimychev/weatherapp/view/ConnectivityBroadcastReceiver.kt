@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.widget.Toast
 
-class MainBroadcastReceiver : BroadcastReceiver() {
+class ConnectivityBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         StringBuilder().apply {
             append("СООБЩЕНИЕ ОТ СИСТЕМЫ\n")
