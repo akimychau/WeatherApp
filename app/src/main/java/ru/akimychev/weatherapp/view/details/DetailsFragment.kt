@@ -12,9 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.*
 import ru.akimychev.weatherapp.BuildConfig
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentDetailsBinding
@@ -22,6 +20,7 @@ import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
 import ru.akimychev.weatherapp.utils.BUNDLE_WEATHER_DTO_KEY
 import ru.akimychev.weatherapp.utils.YANDEX_API_KEY
+import java.io.IOException
 
 class DetailsFragment : Fragment() {
 
@@ -68,19 +67,25 @@ class DetailsFragment : Fragment() {
             builder.url("https://api.weather.yandex.ru/v2/informers?lat=${weatherLocal.city.lat}&lon=${weatherLocal.city.lon}")
             val request: Request = builder.build()
             val call: Call = client.newCall(request)
-            Thread{
-                val response = call.execute()
-                if (response.isSuccessful){
-                    response.body()?.let {
-                        val weatherDTO = Gson().fromJson(it.string(), WeatherDTO::class.java)
+            call.enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    // TODO("Not yet implemented")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val weatherDTO =
+                            Gson().fromJson(response.body()?.string(), WeatherDTO::class.java)
                         weatherLocal.feelsLike = weatherDTO.fact.feelsLike
                         weatherLocal.temperature = weatherDTO.fact.temp
-                        requireActivity().runOnUiThread(){
+                        requireActivity().runOnUiThread() {
                             renderData(weatherLocal)
                         }
+                    } else {
+                        // TODO("Not yet implemented")
                     }
                 }
-            }.start()
+            })
         }
     }
 
