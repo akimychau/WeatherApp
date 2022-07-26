@@ -23,7 +23,7 @@ class DetailsViewModel(
 
     //Выбор репозитория в зависимости от подключения к серверу
     private fun choiceRepository() {
-        repositoryDetails = when (3) {
+        repositoryDetails = when (0) {
             1 -> RepositoryDetailsOkHttpImpl()
             2 -> RepositoryDetailsRetrofitImpl()
             3 -> RepositoryDetailsWeatherLoaderImpl()
