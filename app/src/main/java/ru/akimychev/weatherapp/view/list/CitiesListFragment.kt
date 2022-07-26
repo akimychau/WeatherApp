@@ -21,7 +21,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
     private var _binding: FragmentWeatherListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CitiesListViewModel by lazy {
-        ViewModelProvider(this).get(CitiesListViewModel::class.java)
+        ViewModelProvider(this)[CitiesListViewModel::class.java]
     }
     private var isMixed = true
 
@@ -51,12 +51,6 @@ class CitiesListFragment : Fragment(), OnItemClick {
     //Способы отображения "Статусов"
     private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
         when (citiesListFragmentAppState) {
-            is CitiesListFragmentAppState.Success -> {
-                //val weatherData = appState.weatherData
-                //setData(weatherData)
-                //binding.weatherListFragmentLoadingLayout.visibility = View.GONE
-                //  Snackbar.make(binding.root, "Success", Snackbar.LENGTH_LONG).show()
-            }
             is CitiesListFragmentAppState.Loading -> {
                 binding.weatherListFragmentLoadingLayout.visibility = View.VISIBLE
             }

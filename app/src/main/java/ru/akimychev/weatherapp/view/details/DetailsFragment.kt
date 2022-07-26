@@ -1,8 +1,5 @@
 package ru.akimychev.weatherapp.view.details
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,17 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.gson.Gson
 import okhttp3.*
-import ru.akimychev.weatherapp.BuildConfig
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentDetailsBinding
 import ru.akimychev.weatherapp.domain.Weather
-import ru.akimychev.weatherapp.model.dto.WeatherDTO
-import ru.akimychev.weatherapp.utils.BUNDLE_WEATHER_DTO_KEY
-import ru.akimychev.weatherapp.utils.YANDEX_API_KEY
-import java.io.IOException
+import ru.akimychev.weatherapp.viewmodel.details.DetailsFragmentAppState
+import ru.akimychev.weatherapp.viewmodel.details.DetailsViewModel
 
 class DetailsFragment : Fragment() {
 
@@ -28,15 +22,6 @@ class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent?.let {
-                it.getParcelableExtra<WeatherDTO>(BUNDLE_WEATHER_DTO_KEY)?.let { weatherDTO ->
-                    bindLocalValuesUpdatedFromServer(weatherLocal, weatherDTO)
-                }
-            }
-        }
-    }
     lateinit var weatherLocal: Weather
 
     override fun onCreateView(
@@ -48,6 +33,9 @@ class DetailsFragment : Fragment() {
         return binding.root
     }
 
+    private val viewModel: DetailsViewModel by lazy {
+        ViewModelProvider(this)[DetailsViewModel::class.java]
+    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,68 +43,38 @@ class DetailsFragment : Fragment() {
         val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
         weather?.let { weatherLocal ->
             this.weatherLocal = weatherLocal
-            /*LocalBroadcastManager.getInstance(requireContext())
-                .registerReceiver(receiver, IntentFilter(WAVE))
-
-            requireActivity().startService(Intent(requireContext(), DetailsServiceIntent::class.java).apply {
-                putExtra(BUNDLE_CITY_KEY, weatherLocal.city)
-            })*/
-            val client = OkHttpClient()
-            val builder = Request.Builder()
-            builder.addHeader(YANDEX_API_KEY, BuildConfig.WEATHER_API_KEY)
-            builder.url("https://api.weather.yandex.ru/v2/informers?lat=${weatherLocal.city.lat}&lon=${weatherLocal.city.lon}")
-            val request: Request = builder.build()
-            val call: Call = client.newCall(request)
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    // TODO("Not yet implemented")
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val weatherDTO =
-                            Gson().fromJson(response.body()?.string(), WeatherDTO::class.java)
-                        weatherLocal.feelsLike = weatherDTO.fact.feelsLike
-                        weatherLocal.temperature = weatherDTO.fact.temp
-                        requireActivity().runOnUiThread() {
-                            renderData(weatherLocal)
-                        }
-                    } else {
-                        // TODO("Not yet implemented")
-                    }
-                }
-            })
+            viewModel.getWeather(weatherLocal.city.lat, weatherLocal.city.lon)
+            viewModel.getLiveData().observe(
+                viewLifecycleOwner
+            ) { t -> renderData(t) }
         }
     }
 
-    private fun bindLocalValuesUpdatedFromServer(
-        weatherLocal: Weather,
-        weatherDTO: WeatherDTO
-    ) {
-        renderData(weatherLocal.apply {
-            weatherLocal.feelsLike = weatherDTO.fact.feelsLike
-            weatherLocal.temperature = weatherDTO.fact.temp
-        })
-    }
-
     //Способы отображения "Статусов"
-    private fun renderData(weather: Weather) {
-        with(binding) {
-            cityName.text = weather.city.name
-            cityCoordinates.text = String.format(
-                getString(R.string.city_coordinates),
-                weather.city.lat.toString(),
-                weather.city.lon.toString()
-            )
-            temperatureValue.text = weather.temperature.toString()
-            feelsLikeValue.text = weather.feelsLike.toString()
+    private fun renderData(detailsFragmentAppState: DetailsFragmentAppState) {
+        when (detailsFragmentAppState) {
+            is DetailsFragmentAppState.Error -> binding.loadingLayout.visibility = View.GONE
+            DetailsFragmentAppState.Loading -> binding.loadingLayout.visibility = View.VISIBLE
+            is DetailsFragmentAppState.Success -> {
+                binding.loadingLayout.visibility = View.GONE
+                val weatherDTO = detailsFragmentAppState.weatherData
+                with(binding) {
+                    cityName.text = weatherLocal.city.name
+                    cityCoordinates.text = String.format(
+                        getString(R.string.city_coordinates),
+                        weatherLocal.city.lat.toString(),
+                        weatherLocal.city.lon.toString()
+                    )
+                    temperatureValue.text = weatherDTO.fact.temp.toString()
+                    feelsLikeValue.text = weatherDTO.fact.feelsLike.toString()
+                }
+            }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
     }
 
     //Возвращает фрагмент
