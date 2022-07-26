@@ -13,15 +13,15 @@ import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.utils.showSnackBar
 import ru.akimychev.weatherapp.view.details.DetailsFragment
 import ru.akimychev.weatherapp.view.details.OnItemClick
-import ru.akimychev.weatherapp.viewmodel.AppState
-import ru.akimychev.weatherapp.viewmodel.WeatherListViewModel
+import ru.akimychev.weatherapp.viewmodel.list.CitiesListFragmentAppState
+import ru.akimychev.weatherapp.viewmodel.list.CitiesListViewModel
 
-class WeatherListFragment : Fragment(), OnItemClick {
+class CitiesListFragment : Fragment(), OnItemClick {
     //Инициировали ViewBinding и раздули во фрагменте
     private var _binding: FragmentWeatherListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: WeatherListViewModel by lazy {
-        ViewModelProvider(this).get(WeatherListViewModel::class.java)
+    private val viewModel: CitiesListViewModel by lazy {
+        ViewModelProvider(this).get(CitiesListViewModel::class.java)
     }
     private var isMixed = true
 
@@ -49,28 +49,28 @@ class WeatherListFragment : Fragment(), OnItemClick {
     }
 
     //Способы отображения "Статусов"
-    private fun renderData(appState: AppState) {
-        when (appState) {
-            is AppState.SuccessSingle -> {
+    private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
+        when (citiesListFragmentAppState) {
+            is CitiesListFragmentAppState.Success -> {
                 //val weatherData = appState.weatherData
                 //setData(weatherData)
                 //binding.weatherListFragmentLoadingLayout.visibility = View.GONE
                 //  Snackbar.make(binding.root, "Success", Snackbar.LENGTH_LONG).show()
             }
-            is AppState.Loading -> {
+            is CitiesListFragmentAppState.Loading -> {
                 binding.weatherListFragmentLoadingLayout.visibility = View.VISIBLE
             }
-            is AppState.Error -> {
+            is CitiesListFragmentAppState.Error -> {
                 loadingGone()
                 weatherListFragmentRootView.showSnackBar(
                     getString(R.string.error),
                     getString(R.string.reload),
                     { whichListToChoose() })
             }
-            is AppState.SuccessList -> {
+            is CitiesListFragmentAppState.Success -> {
                 loadingGone()
                 binding.weatherListFragmentRecyclerView.adapter =
-                    WeatherListAdapter(appState.weatherListData, this)
+                    CitiesListAdapter(citiesListFragmentAppState.weatherListData, this)
             }
         }
     }
@@ -98,6 +98,6 @@ class WeatherListFragment : Fragment(), OnItemClick {
 
     //Возвращает фрагмент
     companion object {
-        fun newInstance() = WeatherListFragment()
+        fun newInstance() = CitiesListFragment()
     }
 }

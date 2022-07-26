@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.ActivityMainBinding
-import ru.akimychev.weatherapp.view.list.WeatherListFragment
+import ru.akimychev.weatherapp.view.list.CitiesListFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         //Передали layout фрагмента на экран входа в активити
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, WeatherListFragment.newInstance()).commit()
+                .replace(R.id.container, CitiesListFragment.newInstance()).commit()
         }
         registerReceiver(receiver, IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED))
         registerReceiver(receiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
