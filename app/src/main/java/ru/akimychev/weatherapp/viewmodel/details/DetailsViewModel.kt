@@ -6,7 +6,7 @@ import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryDetails
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsLocalImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsOkHttpImpl
-import ru.akimychev.weatherapp.model.details.RepositoryDetailsRetrofitImpl
+import ru.akimychev.weatherapp.model.details.retrofit.RepositoryDetailsRetrofitImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsWeatherLoaderImpl
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
 import java.io.IOException
@@ -23,7 +23,7 @@ class DetailsViewModel(
 
     //Выбор репозитория в зависимости от подключения к серверу
     private fun choiceRepository() {
-        repositoryDetails = when (0) {
+        repositoryDetails = when (2) {
             1 -> RepositoryDetailsOkHttpImpl()
             2 -> RepositoryDetailsRetrofitImpl()
             3 -> RepositoryDetailsWeatherLoaderImpl()
