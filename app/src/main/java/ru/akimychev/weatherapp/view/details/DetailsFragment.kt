@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import okhttp3.*
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
+import com.squareup.picasso.Picasso
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentDetailsBinding
 import ru.akimychev.weatherapp.domain.Weather
@@ -67,9 +70,28 @@ class DetailsFragment : Fragment() {
                     )
                     temperatureValue.text = weatherDTO.fact.temp.toString()
                     feelsLikeValue.text = weatherDTO.fact.feelsLike.toString()
+                    weatherIcon.loadUrl("https://yastatic.net/weather/i/icons/funky/dark/${weatherDTO.fact.icon}.svg")
+                    Picasso.get().load("https://freepngimg.com/thumb/house/84949-house-housing-recreation-city-hd-image-free-png.png")
+                        .into(headerIcon)
                 }
             }
         }
+    }
+
+    private fun ImageView.loadUrl(url: String) {
+
+        val imageLoader = ImageLoader.Builder(this.context)
+            .componentRegistry { add(SvgDecoder(this@loadUrl.context)) }
+            .build()
+
+        val request = ImageRequest.Builder(this.context)
+            .crossfade(true)
+            .crossfade(500)
+            .data(url)
+            .target(this)
+            .build()
+
+        imageLoader.enqueue(request)
     }
 
     override fun onDestroyView() {

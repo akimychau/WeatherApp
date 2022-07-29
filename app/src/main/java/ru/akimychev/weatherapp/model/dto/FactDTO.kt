@@ -15,4 +15,5 @@ data class FactDTO(
     //val icon: String,
     @SerializedName("temp")
     val temp: Int,
+    val icon: String = "bkn_n"
 ): Parcelable
