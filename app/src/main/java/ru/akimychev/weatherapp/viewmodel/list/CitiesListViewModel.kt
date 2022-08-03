@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import ru.akimychev.weatherapp.model.RepositoryCitiesList
 import ru.akimychev.weatherapp.model.RepositoryCitiesListImpl
 import ru.akimychev.weatherapp.utils.Location
-import java.lang.Thread.sleep
-import kotlin.random.Random
 
 class CitiesListViewModel(
     private val liveData: MutableLiveData<CitiesListFragmentAppState> = MutableLiveData(),
@@ -35,21 +33,8 @@ class CitiesListViewModel(
     //Идет запрос
     private fun sendRequest(location: Location) {
         liveData.value = CitiesListFragmentAppState.Loading
-        Thread {
-            sleep(1000L)
-            val rand = Random(System.nanoTime())
-            if ((0..5).random(rand) == 1) {
-                liveData.postValue(CitiesListFragmentAppState.Error(IllegalStateException("Что-то пошло не так")))
-            } else {
-                liveData.postValue(
-                    CitiesListFragmentAppState.Success(
-                        repositoryCitiesList.getCitiesList(
-                            location
-                        )
-                    )
-                )
-            }
-        }.start()
+        liveData.value =
+            CitiesListFragmentAppState.Success(repositoryCitiesList.getCitiesList(location))
     }
 
     private fun isConnection(): Boolean {

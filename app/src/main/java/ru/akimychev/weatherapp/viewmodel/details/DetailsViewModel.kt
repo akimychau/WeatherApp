@@ -6,8 +6,8 @@ import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryDetails
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsLocalImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsOkHttpImpl
-import ru.akimychev.weatherapp.model.details.retrofit.RepositoryDetailsRetrofitImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsWeatherLoaderImpl
+import ru.akimychev.weatherapp.model.details.retrofit.RepositoryDetailsRetrofitImpl
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
 import java.io.IOException
 

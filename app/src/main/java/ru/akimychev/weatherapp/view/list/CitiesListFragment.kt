@@ -1,5 +1,6 @@
 package ru.akimychev.weatherapp.view.list
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import kotlinx.android.synthetic.main.fragment_weather_list.*
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
 import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.utils.SP_KEY
 import ru.akimychev.weatherapp.utils.showSnackBar
 import ru.akimychev.weatherapp.view.details.DetailsFragment
 import ru.akimychev.weatherapp.view.details.OnItemClick
@@ -23,7 +25,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
     private val viewModel: CitiesListViewModel by lazy {
         ViewModelProvider(this)[CitiesListViewModel::class.java]
     }
-    private var isMixed = true
+    private var isMixed = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,19 +38,15 @@ class CitiesListFragment : Fragment(), OnItemClick {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getLiveData().observe(
-            viewLifecycleOwner
-        ) { t ->  //Подписали VM на обновления View (Связка LD/LO)
+        viewModel.getLiveData().observe(viewLifecycleOwner) { t ->
             renderData(t)
         }
-
         binding.weatherListFragmentFAB.setOnClickListener {
-            whichListToChoose()
+            changeWeatherList()
         }
-        viewModel.getWeatherListForWorld()
+        showListOfTowns()
     }
 
-    //Способы отображения "Статусов"
     private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
         when (citiesListFragmentAppState) {
             is CitiesListFragmentAppState.Loading -> {
@@ -59,7 +57,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
                 weatherListFragmentRootView.showSnackBar(
                     getString(R.string.error),
                     getString(R.string.reload),
-                    { whichListToChoose() })
+                    { changeWeatherList() })
             }
             is CitiesListFragmentAppState.Success -> {
                 loadingGone()
@@ -73,13 +71,29 @@ class CitiesListFragment : Fragment(), OnItemClick {
         binding.weatherListFragmentLoadingLayout.visibility = View.GONE
     }
 
-    private fun whichListToChoose() {
-        isMixed = !isMixed
+    private fun showListOfTowns() {
+        activity?.let {
+            if (it.getPreferences(Context.MODE_PRIVATE).getBoolean(SP_KEY, false)) {
+                changeWeatherList()
+            } else {
+                viewModel.getWeatherListForWorld()
+            }
+        }
+    }
+
+    private fun changeWeatherList() {
         with(viewModel) {
             if (isMixed) {
                 getWeatherListForWorld()
             } else {
                 getWeatherListForRussia()
+            }
+        }
+        isMixed = !isMixed
+        activity?.let {
+            with(it.getPreferences(Context.MODE_PRIVATE).edit()) {
+                putBoolean(SP_KEY, isMixed)
+                apply()
             }
         }
     }
@@ -90,7 +104,6 @@ class CitiesListFragment : Fragment(), OnItemClick {
             .commit()
     }
 
-    //Возвращает фрагмент
     companion object {
         fun newInstance() = CitiesListFragment()
     }
