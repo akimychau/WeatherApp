@@ -72,13 +72,11 @@ class CitiesListFragment : Fragment(), OnItemClick {
     }
 
     private fun showListOfTowns() {
-        activity?.let {
-            if (it.getPreferences(Context.MODE_PRIVATE).getBoolean(SP_KEY, false)) {
+            if (requireActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(SP_KEY, false)) {
                 changeWeatherList()
             } else {
                 viewModel.getWeatherListForWorld()
             }
-        }
     }
 
     private fun changeWeatherList() {
@@ -90,11 +88,9 @@ class CitiesListFragment : Fragment(), OnItemClick {
             }
         }
         isMixed = !isMixed
-        activity?.let {
-            with(it.getPreferences(Context.MODE_PRIVATE).edit()) {
-                putBoolean(SP_KEY, isMixed)
-                apply()
-            }
+        with(requireActivity().getPreferences(Context.MODE_PRIVATE).edit()) {
+            putBoolean(SP_KEY, isMixed)
+            apply()
         }
     }
 
