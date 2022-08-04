@@ -6,7 +6,11 @@ import ru.akimychev.weatherapp.utils.Location
 import java.io.IOException
 
 fun interface RepositoryDetails {
-    fun getWeather(lat: Double, lon: Double, callback: AllInOneCallback)
+    fun getWeather(weather: Weather, callback: AllInOneCallback)
+}
+
+fun interface RepositoryAddWeather {
+    fun addWeather(weather: Weather)
 }
 
 fun interface RepositoryCitiesList {
@@ -14,6 +18,6 @@ fun interface RepositoryCitiesList {
 }
 
 interface AllInOneCallback {
-    fun onResponse(weatherDTO: WeatherDTO)
+    fun onResponse(weather: Weather)
     fun onFailure(e: IOException)
 }

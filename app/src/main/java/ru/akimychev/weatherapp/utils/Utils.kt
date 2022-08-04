@@ -1,11 +1,16 @@
 package ru.akimychev.weatherapp.utils
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.io.BufferedReader
-import java.util.stream.Collectors
+import ru.akimychev.weatherapp.domain.City
+import ru.akimychev.weatherapp.domain.Weather
+import ru.akimychev.weatherapp.model.dto.FactDTO
+import ru.akimychev.weatherapp.model.dto.WeatherDTO
 
-@RequiresApi(Build.VERSION_CODES.N)
-fun getLines(reader: BufferedReader): String {
-    return reader.lines().collect(Collectors.joining("\n"))
+fun convertModelToDTO(weather: Weather): WeatherDTO {
+    val fact = FactDTO(weather.feelsLike, weather.temperature)
+    return WeatherDTO(fact)
+}
+
+fun bindDtoWithCity(weatherDTO: WeatherDTO, city: City): Weather {
+    val fact: FactDTO = weatherDTO.fact
+    return Weather(city, fact.temp, fact.feelsLike)
 }

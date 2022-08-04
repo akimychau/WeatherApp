@@ -46,7 +46,7 @@ class DetailsFragment : Fragment() {
         val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
         weather?.let { weatherLocal ->
             this.weatherLocal = weatherLocal
-            viewModel.getWeather(weatherLocal.city.lat, weatherLocal.city.lon)
+            viewModel.getWeather(weatherLocal)
             viewModel.getLiveData().observe(
                 viewLifecycleOwner
             ) { t -> renderData(t) }
@@ -60,17 +60,17 @@ class DetailsFragment : Fragment() {
             DetailsFragmentAppState.Loading -> binding.loadingLayout.visibility = View.VISIBLE
             is DetailsFragmentAppState.Success -> {
                 binding.loadingLayout.visibility = View.GONE
-                val weatherDTO = detailsFragmentAppState.weatherData
+                val weather = detailsFragmentAppState.weatherData
                 with(binding) {
-                    cityName.text = weatherLocal.city.name
+                    cityName.text = weather.city.name
                     cityCoordinates.text = String.format(
                         getString(R.string.city_coordinates),
                         weatherLocal.city.lat.toString(),
                         weatherLocal.city.lon.toString()
                     )
-                    temperatureValue.text = weatherDTO.fact.temp.toString()
-                    feelsLikeValue.text = weatherDTO.fact.feelsLike.toString()
-                    weatherIcon.loadUrl("https://yastatic.net/weather/i/icons/funky/dark/${weatherDTO.fact.icon}.svg")
+                    temperatureValue.text = weather.temperature.toString()
+                    feelsLikeValue.text = weather.feelsLike.toString()
+                    weatherIcon.loadUrl("https://yastatic.net/weather/i/icons/funky/dark/${weather.icon}.svg")
                     Picasso.get().load("https://freepngimg.com/thumb/house/84949-house-housing-recreation-city-hd-image-free-png.png")
                         .into(headerIcon)
                 }

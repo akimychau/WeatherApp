@@ -11,5 +11,6 @@ const val RETROFIT_GET = "v2/informers"
 const val RETROFIT_LAT = "lat"
 const val RETROFIT_LON = "lon"
 
-const val SP_KEY = "SP_KEY"
+const val SP_DB_KEY = "SP_KEY"
 
+const val ROOM_DB_KEY = "ROOM_DB_KEY"

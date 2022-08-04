@@ -2,13 +2,15 @@ package ru.akimychev.weatherapp.viewmodel.details
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.AllInOneCallback
+import ru.akimychev.weatherapp.model.RepositoryAddWeather
 import ru.akimychev.weatherapp.model.RepositoryDetails
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsLocalImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsOkHttpImpl
 import ru.akimychev.weatherapp.model.details.RepositoryDetailsWeatherLoaderImpl
 import ru.akimychev.weatherapp.model.details.retrofit.RepositoryDetailsRetrofitImpl
-import ru.akimychev.weatherapp.model.dto.WeatherDTO
+import ru.akimychev.weatherapp.model.room.RepositoryDetailsRoomImpl
 import java.io.IOException
 
 class DetailsViewModel(
@@ -16,6 +18,8 @@ class DetailsViewModel(
 ) :
     ViewModel() {
     lateinit var repositoryDetails: RepositoryDetails
+    lateinit var repositoryAddWeather: RepositoryAddWeather
+
     fun getLiveData(): MutableLiveData<DetailsFragmentAppState> {
         choiceRepository()
         return liveData
@@ -23,30 +27,38 @@ class DetailsViewModel(
 
     //Выбор репозитория в зависимости от подключения к серверу
     private fun choiceRepository() {
-        repositoryDetails = when (2) {
-            1 -> RepositoryDetailsOkHttpImpl()
-            2 -> RepositoryDetailsRetrofitImpl()
-            3 -> RepositoryDetailsWeatherLoaderImpl()
-            else -> RepositoryDetailsLocalImpl()
+        if (isConnection()) {
+            repositoryDetails = when (2) {
+                1 -> RepositoryDetailsOkHttpImpl()
+                2 -> RepositoryDetailsRetrofitImpl()
+                else -> RepositoryDetailsWeatherLoaderImpl()
+            }
+            repositoryAddWeather = RepositoryDetailsRoomImpl()
+        } else {
+            repositoryDetails = when (1) {
+                1 -> RepositoryDetailsRoomImpl()
+                else -> RepositoryDetailsLocalImpl()
+            }
+            repositoryAddWeather = RepositoryDetailsRoomImpl()
         }
     }
 
     //Идет запрос
-    fun getWeather(lat: Double, lon: Double) {
+    fun getWeather(weather: Weather) {
         choiceRepository()
         liveData.value = DetailsFragmentAppState.Loading
-        repositoryDetails.getWeather(lat, lon, callback)
+        repositoryDetails.getWeather(weather, callback)
     }
 
     private val callback = object : AllInOneCallback {
-        override fun onResponse(weatherDTO: WeatherDTO) {
-            liveData.postValue(DetailsFragmentAppState.Success(weatherDTO))
+        override fun onResponse(weather: Weather) {
+            if (isConnection()) repositoryAddWeather.addWeather(weather)
+            liveData.postValue(DetailsFragmentAppState.Success(weather))
         }
 
         override fun onFailure(e: IOException) {
             liveData.postValue(DetailsFragmentAppState.Error(e))
         }
-
     }
 }
 

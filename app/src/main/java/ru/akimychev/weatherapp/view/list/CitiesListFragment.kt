@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.fragment_weather_list.*
+import kotlinx.android.synthetic.main.fragment_history_cities_list.*
 import ru.akimychev.weatherapp.R
-import ru.akimychev.weatherapp.databinding.FragmentWeatherListBinding
+import ru.akimychev.weatherapp.databinding.FragmentCitiesListBinding
 import ru.akimychev.weatherapp.domain.Weather
-import ru.akimychev.weatherapp.utils.SP_KEY
+import ru.akimychev.weatherapp.utils.SP_DB_KEY
 import ru.akimychev.weatherapp.utils.showSnackBar
 import ru.akimychev.weatherapp.view.details.DetailsFragment
 import ru.akimychev.weatherapp.view.details.OnItemClick
@@ -20,7 +20,7 @@ import ru.akimychev.weatherapp.viewmodel.list.CitiesListViewModel
 
 class CitiesListFragment : Fragment(), OnItemClick {
     //Инициировали ViewBinding и раздули во фрагменте
-    private var _binding: FragmentWeatherListBinding? = null
+    private var _binding: FragmentCitiesListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CitiesListViewModel by lazy {
         ViewModelProvider(this)[CitiesListViewModel::class.java]
@@ -32,7 +32,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWeatherListBinding.inflate(inflater, container, false)
+        _binding = FragmentCitiesListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,7 +41,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
         viewModel.getLiveData().observe(viewLifecycleOwner) { t ->
             renderData(t)
         }
-        binding.weatherListFragmentFAB.setOnClickListener {
+        binding.citiesListFragmentFAB.setOnClickListener {
             changeWeatherList()
         }
         showListOfTowns()
@@ -50,33 +50,33 @@ class CitiesListFragment : Fragment(), OnItemClick {
     private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
         when (citiesListFragmentAppState) {
             is CitiesListFragmentAppState.Loading -> {
-                binding.weatherListFragmentLoadingLayout.visibility = View.VISIBLE
+                binding.citiesListFragmentLoadingLayout.visibility = View.VISIBLE
             }
             is CitiesListFragmentAppState.Error -> {
                 loadingGone()
-                weatherListFragmentRootView.showSnackBar(
+                citiesHistoryListFragmentRootView.showSnackBar(
                     getString(R.string.error),
                     getString(R.string.reload),
                     { changeWeatherList() })
             }
             is CitiesListFragmentAppState.Success -> {
                 loadingGone()
-                binding.weatherListFragmentRecyclerView.adapter =
+                binding.citiesListFragmentRecyclerView.adapter =
                     CitiesListAdapter(citiesListFragmentAppState.weatherListData, this)
             }
         }
     }
 
     private fun loadingGone() {
-        binding.weatherListFragmentLoadingLayout.visibility = View.GONE
+        binding.citiesListFragmentLoadingLayout.visibility = View.GONE
     }
 
     private fun showListOfTowns() {
-            if (requireActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(SP_KEY, false)) {
-                changeWeatherList()
-            } else {
-                viewModel.getWeatherListForWorld()
-            }
+        if (requireActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(SP_DB_KEY, false)) {
+            changeWeatherList()
+        } else {
+            viewModel.getWeatherListForWorld()
+        }
     }
 
     private fun changeWeatherList() {
@@ -89,7 +89,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
         }
         isMixed = !isMixed
         with(requireActivity().getPreferences(Context.MODE_PRIVATE).edit()) {
-            putBoolean(SP_KEY, isMixed)
+            putBoolean(SP_DB_KEY, isMixed)
             apply()
         }
     }

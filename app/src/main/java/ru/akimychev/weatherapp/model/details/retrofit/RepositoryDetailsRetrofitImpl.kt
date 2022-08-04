@@ -7,19 +7,21 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.akimychev.weatherapp.BuildConfig
+import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryDetails
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
+import ru.akimychev.weatherapp.utils.bindDtoWithCity
 import java.io.IOException
 
 class RepositoryDetailsRetrofitImpl : RepositoryDetails {
-    override fun getWeather(lat: Double, lon: Double, callback: AllInOneCallback) {
+    override fun getWeather(weather: Weather, callback: AllInOneCallback) {
         val api = retrofitImpl.build().create(WeatherAPI::class.java)
-        api.getWeather(BuildConfig.WEATHER_API_KEY, lat, lon)
+        api.getWeather(BuildConfig.WEATHER_API_KEY, weather.city.lat, weather.city.lon)
             .enqueue(object : Callback<WeatherDTO> {
                 override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
                     if (response.isSuccessful && response.body() != null) {
-                        callback.onResponse(response.body()!!)
+                        callback.onResponse(bindDtoWithCity(response.body()!!, weather.city))
                     } else {
                         callback.onFailure(IOException("403"))
                     }
