@@ -16,13 +16,14 @@ class MyApp : Application() {
         private var myApp: MyApp? = null
         private var weatherDatabase: WeatherDatabase? = null
         private fun getMyApp() = myApp!!
+
         fun getWeatherDatabase(): WeatherDatabase {
-                if (weatherDatabase == null) {
-                    weatherDatabase =
-                        Room.databaseBuilder(getMyApp(), WeatherDatabase::class.java, ROOM_DB_KEY)
-                            .allowMainThreadQueries()
-                            .build()
-                }
+            if (weatherDatabase == null) {
+                weatherDatabase =
+                    Room.databaseBuilder(getMyApp(), WeatherDatabase::class.java, ROOM_DB_KEY)
+                        .allowMainThreadQueries()
+                        .build()
+            }
             return weatherDatabase!!
         }
     }

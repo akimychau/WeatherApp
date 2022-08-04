@@ -25,8 +25,6 @@ class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var weatherLocal: Weather
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,12 +42,11 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA_WEATHER)
-        weather?.let { weatherLocal ->
-            this.weatherLocal = weatherLocal
-            viewModel.getWeather(weatherLocal)
+        weather?.let {
             viewModel.getLiveData().observe(
                 viewLifecycleOwner
             ) { t -> renderData(t) }
+            viewModel.getWeather(it.city)
         }
     }
 
@@ -65,8 +62,8 @@ class DetailsFragment : Fragment() {
                     cityName.text = weather.city.name
                     cityCoordinates.text = String.format(
                         getString(R.string.city_coordinates),
-                        weatherLocal.city.lat.toString(),
-                        weatherLocal.city.lon.toString()
+                        weather.city.lat.toString(),
+                        weather.city.lon.toString()
                     )
                     temperatureValue.text = weather.temperature.toString()
                     feelsLikeValue.text = weather.feelsLike.toString()

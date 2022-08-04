@@ -1,12 +1,15 @@
-package ru.akimychev.weatherapp.view
+package ru.akimychev.weatherapp
 
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.ActivityMainBinding
+import ru.akimychev.weatherapp.view.ConnectivityBroadcastReceiver
 import ru.akimychev.weatherapp.view.list.CitiesListFragment
+import ru.akimychev.weatherapp.view.room.HistoryCitiesListFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -24,6 +27,26 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, CitiesListFragment.newInstance()).commit()
         }
         registerReceiver(receiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_screen_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.history_menu -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, HistoryCitiesListFragment())
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+        }
     }
 
     override fun onDestroy() {

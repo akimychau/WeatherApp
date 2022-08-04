@@ -2,6 +2,7 @@ package ru.akimychev.weatherapp.model.details
 
 import com.google.gson.Gson
 import ru.akimychev.weatherapp.BuildConfig
+import ru.akimychev.weatherapp.domain.City
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryDetails
@@ -15,8 +16,8 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 class RepositoryDetailsWeatherLoaderImpl : RepositoryDetails {
-    override fun getWeather(weather: Weather, callback: AllInOneCallback) {
-        val uri = URL("https://api.weather.yandex.ru/v2/informers?lat=${weather.city.lat}&lon=${weather.city.lon}")
+    override fun getWeather(city: City, callback: AllInOneCallback) {
+        val uri = URL("https://api.weather.yandex.ru/v2/informers?lat=${city.lat}&lon=${city.lon}")
         Thread {
             val myConnection =
                 uri.openConnection().apply { readTimeout = 5000 } as HttpsURLConnection
@@ -25,7 +26,7 @@ class RepositoryDetailsWeatherLoaderImpl : RepositoryDetails {
                     addRequestProperty(YANDEX_API_KEY, BuildConfig.WEATHER_API_KEY)
                     val reader = BufferedReader(InputStreamReader(inputStream))
                     val weatherDTO = Gson().fromJson(reader, WeatherDTO::class.java)
-                    callback.onResponse(bindDtoWithCity(weatherDTO, weather.city))
+                    callback.onResponse(bindDtoWithCity(weatherDTO, city))
                 }
             } catch (e: IOException) {
                 callback.onFailure(e)

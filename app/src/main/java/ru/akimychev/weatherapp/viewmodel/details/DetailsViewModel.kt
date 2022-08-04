@@ -2,6 +2,7 @@ package ru.akimychev.weatherapp.viewmodel.details
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ru.akimychev.weatherapp.domain.City
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryAddWeather
@@ -44,10 +45,10 @@ class DetailsViewModel(
     }
 
     //Идет запрос
-    fun getWeather(weather: Weather) {
+    fun getWeather(city: City) {
         choiceRepository()
         liveData.value = DetailsFragmentAppState.Loading
-        repositoryDetails.getWeather(weather, callback)
+        repositoryDetails.getWeather(city, callback)
     }
 
     private val callback = object : AllInOneCallback {
