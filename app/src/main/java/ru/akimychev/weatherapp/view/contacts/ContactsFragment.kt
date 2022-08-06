@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import ru.akimychev.weatherapp.databinding.FragmentContactsBinding
@@ -40,6 +41,18 @@ class ContactsFragment : Fragment() {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
         if (permResult == PackageManager.PERMISSION_GRANTED) {
             getContacts()
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Доступ к контактам")
+                .setMessage("Для использования данной функции требуется предоставить доступ к контактам.\nВы можете предоставить его самостоятельно через 'Настройки' Вашего устройства в любой момент")
+                .setPositiveButton("Предоставить доступ") { _, _ ->
+                    permissionRequest(Manifest.permission.READ_CONTACTS)
+                }
+                .setNegativeButton("Отклонить") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
         } else {
             permissionRequest(Manifest.permission.READ_CONTACTS)
         }
