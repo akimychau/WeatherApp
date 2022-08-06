@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import ru.akimychev.weatherapp.databinding.ActivityMainBinding
 import ru.akimychev.weatherapp.view.ConnectivityBroadcastReceiver
+import ru.akimychev.weatherapp.view.contacts.ContactsFragment
 import ru.akimychev.weatherapp.view.list.CitiesListFragment
 import ru.akimychev.weatherapp.view.room.HistoryCitiesListFragment
 
@@ -36,9 +37,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.history_menu -> {
+            R.id.menu_history -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.container, HistoryCitiesListFragment())
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+                true
+            }
+            R.id.menu_contacts -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, ContactsFragment())
                     .addToBackStack("")
                     .commitAllowingStateLoss()
                 true
