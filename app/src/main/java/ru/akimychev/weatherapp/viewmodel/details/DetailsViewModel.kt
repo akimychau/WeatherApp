@@ -64,5 +64,5 @@ class DetailsViewModel(
 }
 
 private fun isConnection(): Boolean {
-    return false
+    return true
 }

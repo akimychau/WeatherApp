@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -40,6 +41,7 @@ class ContactsFragment : Fragment() {
     private fun checkPermission() {
         val permResult =
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
+        PackageManager.PERMISSION_GRANTED
         if (permResult == PackageManager.PERMISSION_GRANTED) {
             getContacts()
         } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
@@ -87,7 +89,7 @@ class ContactsFragment : Fragment() {
             null,
             null,
             null,
-            ContactsContract.Contacts.DISPLAY_NAME + "ASC"
+            ContactsContract.Contacts.DISPLAY_NAME + " ASC"
         )
         cursorWithContacts?.let {cursor->
             for (i in 0 until cursor.count){
