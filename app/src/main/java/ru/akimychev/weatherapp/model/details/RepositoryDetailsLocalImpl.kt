@@ -1,7 +1,6 @@
 package ru.akimychev.weatherapp.model.details
 
 import ru.akimychev.weatherapp.domain.City
-import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.domain.getRussianCities
 import ru.akimychev.weatherapp.domain.getWorldCities
 import ru.akimychev.weatherapp.model.AllInOneCallback

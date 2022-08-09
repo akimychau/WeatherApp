@@ -1,7 +1,5 @@
 package ru.akimychev.weatherapp.model.room
 
-import android.os.Handler
-import android.os.Looper
 import ru.akimychev.weatherapp.MyApp
 import ru.akimychev.weatherapp.domain.City
 import ru.akimychev.weatherapp.domain.Weather

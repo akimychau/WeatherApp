@@ -4,10 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.HistoryCitiesCallback
-import ru.akimychev.weatherapp.model.RepositoryCitiesList
-import ru.akimychev.weatherapp.model.RepositoryCitiesListImpl
 import ru.akimychev.weatherapp.model.room.RepositoryDetailsRoomImpl
-import ru.akimychev.weatherapp.utils.Location
 import java.io.IOException
 
 class CitiesHistoryListViewModel(

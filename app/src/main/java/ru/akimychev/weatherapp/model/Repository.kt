@@ -2,7 +2,6 @@ package ru.akimychev.weatherapp.model
 
 import ru.akimychev.weatherapp.domain.City
 import ru.akimychev.weatherapp.domain.Weather
-import ru.akimychev.weatherapp.model.dto.WeatherDTO
 import ru.akimychev.weatherapp.utils.Location
 import java.io.IOException
 

@@ -8,4 +8,16 @@
     <string name="reload">Попробовать снова</string>
     <string name="history">History</string>
     <string name="contacts" />
+    <string name="beginner" />
+    <string name="advanced" />
+    <string name="need_permission_header" />
+    <string name="need_permission_text" />
+    <string name="need_permission_give" />
+    <string name="need_permission_dont_give" />
+    <string name="need_permission_text_again" />
+    <string name="home" />
+    <string name="mobile" />
+    <string name="work" />
+    <string name="other" />
+    <string name="call" />
 </resources>

@@ -8,7 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.akimychev.weatherapp.BuildConfig
 import ru.akimychev.weatherapp.domain.City
-import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.model.AllInOneCallback
 import ru.akimychev.weatherapp.model.RepositoryDetails
 import ru.akimychev.weatherapp.model.dto.WeatherDTO
