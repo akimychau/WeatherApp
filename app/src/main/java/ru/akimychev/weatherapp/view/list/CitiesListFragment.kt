@@ -1,10 +1,19 @@
 package ru.akimychev.weatherapp.view.list
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.fragment_history_cities_list.*
@@ -44,7 +53,84 @@ class CitiesListFragment : Fragment(), OnItemClick {
         binding.citiesListFragmentFAB.setOnClickListener {
             changeWeatherList()
         }
+        binding.citiesListFragmentFABLocation.setOnClickListener {
+            checkPermission()
+        }
         showListOfTowns()
+    }
+
+    private fun getLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            val locationManager =
+                requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                val provider = locationManager.getProvider(LocationManager.GPS_PROVIDER)
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    2000L,
+                    0F,
+                    object : LocationListener {
+                        override fun onLocationChanged(p0: Location) {
+
+                        }
+                    })
+            }
+        }
+    }
+
+    private fun checkPermission() {
+        val permResult =
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        if (permResult == PackageManager.PERMISSION_GRANTED) {
+            getLocation()
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            showDialog()
+        } else {
+            permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private val REQUEST_CODE_LOCATION = 999
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CODE_LOCATION) {
+            for (pIndex in permissions.indices) {
+                if (permissions[pIndex] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[pIndex] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation()
+                    Log.d("@@@", "Получили")
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun permissionRequest(permission: String) {
+        requestPermissions(arrayOf(permission), REQUEST_CODE_LOCATION)
+    }
+
+    private fun showDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Доступ к контактам")
+            .setMessage("Для использования данной функции требуется предоставить доступ к контактам.\nВы можете предоставить его самостоятельно через 'Настройки' Вашего устройства в любой момент")
+            .setPositiveButton("Предоставить доступ") { _, _ ->
+                permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            .setNegativeButton("Отклонить") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 
     private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
