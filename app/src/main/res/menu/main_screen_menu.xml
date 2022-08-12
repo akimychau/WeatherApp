@@ -11,4 +11,10 @@
         android:icon="@drawable/ic_baseline_contacts_24"
         android:title="@string/contacts"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_maps"
+        android:icon="@android:drawable/ic_dialog_map"
+        android:title="@string/maps"
+        app:showAsAction="always" />
 </menu>

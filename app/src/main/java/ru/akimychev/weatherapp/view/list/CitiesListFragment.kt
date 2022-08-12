@@ -129,8 +129,8 @@ class CitiesListFragment : Fragment(), OnItemClick {
 
     private fun showDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Доступ к контактам")
-            .setMessage("Для использования данной функции требуется предоставить доступ к контактам.\nВы можете предоставить его самостоятельно через 'Настройки' Вашего устройства в любой момент")
+            .setTitle("Доступ к местоположению")
+            .setMessage("Для определения местонахождения требуется предоставить доступ")
             .setPositiveButton("Предоставить доступ") { _, _ ->
                 permissionRequest(Manifest.permission.ACCESS_FINE_LOCATION)
             }
@@ -145,6 +145,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
         val geocoder = Geocoder(context)
         Thread {
             val address = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            locationManager.removeUpdates(locationListener)
             onItemClick(
                 Weather(
                     City(
@@ -205,7 +206,6 @@ class CitiesListFragment : Fragment(), OnItemClick {
     }
 
     override fun onItemClick(weather: Weather) {
-        locationManager.removeUpdates(locationListener)
         requireActivity().supportFragmentManager.beginTransaction().hide(this)
             .add(R.id.container, DetailsFragment.newInstance(weather)).addToBackStack("")
             .commit()

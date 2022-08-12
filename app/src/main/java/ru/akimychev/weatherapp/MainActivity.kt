@@ -10,6 +10,7 @@ import ru.akimychev.weatherapp.databinding.ActivityMainBinding
 import ru.akimychev.weatherapp.view.ConnectivityBroadcastReceiver
 import ru.akimychev.weatherapp.view.contacts.ContactsFragment
 import ru.akimychev.weatherapp.view.list.CitiesListFragment
+import ru.akimychev.weatherapp.view.maps.MapsFragment
 import ru.akimychev.weatherapp.view.room.HistoryCitiesListFragment
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +48,13 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_contacts -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.container, ContactsFragment())
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+                true
+            }
+            R.id.menu_maps -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, MapsFragment())
                     .addToBackStack("")
                     .commitAllowingStateLoss()
                 true
