@@ -3,6 +3,7 @@ package ru.akimychev.weatherapp.view.list
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.fragment_history_cities_list.*
 import ru.akimychev.weatherapp.R
 import ru.akimychev.weatherapp.databinding.FragmentCitiesListBinding
+import ru.akimychev.weatherapp.domain.City
 import ru.akimychev.weatherapp.domain.Weather
 import ru.akimychev.weatherapp.utils.SP_DB_KEY
 import ru.akimychev.weatherapp.utils.showSnackBar
@@ -59,26 +61,32 @@ class CitiesListFragment : Fragment(), OnItemClick {
         showListOfTowns()
     }
 
+    lateinit var locationManager: LocationManager
+
     private fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            val locationManager =
+            locationManager =
                 requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 val provider = locationManager.getProvider(LocationManager.GPS_PROVIDER)
                 locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    2000L,
+                    200L,
                     0F,
-                    object : LocationListener {
-                        override fun onLocationChanged(p0: Location) {
-
-                        }
-                    })
+                    locationListener
+                )
             }
+        }
+    }
+
+    private val locationListener = object : LocationListener {
+        override fun onLocationChanged(p0: Location) {
+            Log.d("@@@", "${p0.latitude} ${p0.longitude}")
+            getAddress(p0)
         }
     }
 
@@ -133,6 +141,22 @@ class CitiesListFragment : Fragment(), OnItemClick {
             .show()
     }
 
+    private fun getAddress(location: Location) {
+        val geocoder = Geocoder(context)
+        Thread {
+            val address = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            onItemClick(
+                Weather(
+                    City(
+                        address.first().locality,
+                        location.latitude,
+                        location.longitude
+                    )
+                )
+            )
+        }.start()
+    }
+
     private fun renderData(citiesListFragmentAppState: CitiesListFragmentAppState) {
         when (citiesListFragmentAppState) {
             is CitiesListFragmentAppState.Loading -> {
@@ -181,6 +205,7 @@ class CitiesListFragment : Fragment(), OnItemClick {
     }
 
     override fun onItemClick(weather: Weather) {
+        locationManager.removeUpdates(locationListener)
         requireActivity().supportFragmentManager.beginTransaction().hide(this)
             .add(R.id.container, DetailsFragment.newInstance(weather)).addToBackStack("")
             .commit()
