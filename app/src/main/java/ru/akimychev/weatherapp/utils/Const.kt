@@ -14,3 +14,9 @@ const val RETROFIT_LON = "lon"
 const val SP_DB_KEY = "SP_KEY"
 
 const val ROOM_DB_KEY = "ROOM_DB_KEY"
+
+const val CHANNEL_HIGH_ID = "channel_we3tw43"
+const val NOTIFICATION_ID1 = 1
+
+const val NOTIFICATION_KEY_TITLE = "myTitle"
+const val NOTIFICATION_KEY_BODY = "myBody"

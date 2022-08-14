@@ -3,9 +3,12 @@ package ru.akimychev.weatherapp
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import ru.akimychev.weatherapp.databinding.ActivityMainBinding
 import ru.akimychev.weatherapp.view.ConnectivityBroadcastReceiver
 import ru.akimychev.weatherapp.view.contacts.ContactsFragment
@@ -29,6 +32,15 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, CitiesListFragment.newInstance()).commit()
         }
         registerReceiver(receiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("@@@", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("@@@", "$token")
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
